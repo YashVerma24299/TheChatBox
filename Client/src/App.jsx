@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import Navbar from './components/Navbar.jsx'
 // Routes is like a container that holds all your routes.
 // Route defines path
@@ -9,8 +9,26 @@ import SignUpPage from './pages/SignUpPage'
 import LoginPage from './pages/LoginPage'
 import SettingsPage from './pages/SettingsPage'
 import ProfilePage from './pages/ProfilePage'
+import { useAuthStore } from './store/useAuthStore.js'
+
+import {Loader} from "lucide-react"
 
 const App = () => {
+  const {authUser,checkAuth, isCheckingAuth} = useAuthStore();
+
+  useEffect(()=>{
+    checkAuth();
+  },[checkAuth]);
+
+  if (isCheckingAuth && !authUser){
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <Loader className="size-10 animate-spin" />
+      </div>
+    );
+  }
+    
+
   return (
     <div >
       {/* <Navbar/> → Renders the navigation bar on top (always visible). */}
