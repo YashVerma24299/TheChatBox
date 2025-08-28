@@ -2,7 +2,7 @@ import React, { useEffect } from 'react'
 import Navbar from './components/Navbar.jsx'
 // Routes is like a container that holds all your routes.
 // Route defines path
-import {Routes, Route} from 'react-router-dom'
+import {Routes, Route, Navigate} from 'react-router-dom'
 
 import HomePage from './pages/HomePage'
 import SignUpPage from './pages/SignUpPage'
@@ -19,6 +19,7 @@ const App = () => {
   useEffect(()=>{
     checkAuth();
   },[checkAuth]);
+  console.log(authUser);
 
   if (isCheckingAuth && !authUser){
     return (
@@ -34,12 +35,12 @@ const App = () => {
       {/* <Navbar/> → Renders the navigation bar on top (always visible). */}
       <Navbar/>
       {/* Handles page routing. */}
-      <Routes> 
-        <Route path='/' element={<HomePage/>}/>
-        <Route path='/signup' element={<SignUpPage/>}/>
-        <Route path='/login' element={<LoginPage/>}/>
-        <Route path='/settings' element={<SettingsPage/>}/>
-        <Route path='/profile' element={<ProfilePage/>}/>
+      <Routes>
+        <Route path="/" element={authUser ? <HomePage /> : <Navigate to="/login" />} />
+        <Route path="/signup" element={!authUser ? <SignUpPage /> : <Navigate to="/" />} />
+        <Route path="/login" element={!authUser ? <LoginPage /> : <Navigate to="/" />} />
+        <Route path="/settings" element={<SettingsPage />} />
+        <Route path="/profile" element={authUser ? <ProfilePage /> : <Navigate to="/login" />} />
       </Routes>
     </div>
   )
