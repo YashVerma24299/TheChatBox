@@ -23,7 +23,7 @@ app.use(
 );
 
 app.use("/api/auth", authRoutes); // Handle login,logout,signup route
-app.use("/api/mesages", messageRoutes);
+app.use("/api/messages", messageRoutes);
 
 app.listen(PORT, ()=>{
     console.log("Server is running on PORT: "+PORT);
