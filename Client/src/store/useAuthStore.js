@@ -10,6 +10,8 @@ export const useAuthStore = create((set) => ({
 
     isCheckingAuth: true,
 
+    onlineUsers: [],
+
     // checkAuth() asks backend: “Hey, is this user already logged in?”
     // If yes → saves user info in store (authUser).
     // If no → clears authUser.
