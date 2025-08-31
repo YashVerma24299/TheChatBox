@@ -3,9 +3,6 @@ import { checkAuth, login, logout, signup, updateProfile} from "../controllers/a
 import {protectRoute} from "../middleware/auth.middleware.js";
 const router = express.Router();
 
-router.get('/', (req,res)=>{
-    res.send("api/auth");
-})
 // For more precisely we make login, logout, signup  on another place.
 router.post('/signup', signup); 
 router.post('/login', login);
