@@ -16,13 +16,7 @@ const PORT=process.env.PORT;
 app.use(express.json());
 app.use(cookieParser());
 
-if (process.env.NODE_ENV === "production") {
-  app.use(express.static(path.join(__dirname, "../Client/dist")));
 
-  app.get("*", (req, res) => {
-    res.sendFile(path.join(__dirname, "../Client", "dist", "index.html"));
-  });
-}
 
 // you’re telling your backend to handle requests coming from a different origin (frontend side).
 app.use(
@@ -34,6 +28,14 @@ app.use(
 
 app.use("/api/auth", authRoutes); // Handle login,logout,signup route
 app.use("/api/messages", messageRoutes);
+
+if (process.env.NODE_ENV === "production") {
+  app.use(express.static(path.join(__dirname, "../Client/dist")));
+
+  app.get("*", (req, res) => {
+    res.sendFile(path.join(__dirname, "../Client", "dist", "index.html"));
+  });
+}
 
 server.listen(PORT, ()=>{
     console.log("Server is running on PORT: "+PORT);
