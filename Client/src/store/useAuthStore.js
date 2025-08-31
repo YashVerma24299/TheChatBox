@@ -1,8 +1,11 @@
 import { create } from "zustand";
 import { axiosInstance } from "../lib/axios.js";
 import toast from "react-hot-toast";
+import { io } from "socket.io-client";
 
-export const useAuthStore = create((set) => ({
+const BASE_URL = "http://localhost:5001";
+
+export const useAuthStore = create((set,get) => ({
     authUser: null,
     isSigningUp: false,
     isLoggingIn: false,
@@ -11,6 +14,8 @@ export const useAuthStore = create((set) => ({
     isCheckingAuth: true,
 
     onlineUsers: [],
+
+    socket:null,
 
     // checkAuth() asks backend: “Hey, is this user already logged in?”
     // If yes → saves user info in store (authUser).
@@ -21,6 +26,7 @@ export const useAuthStore = create((set) => ({
             // baseURL: "http://localhost:5001/api" this mention in the "axiosInstance"
             const res = await axiosInstance.get("/auth/check");
             set({ authUser: res.data }); // get data from backend
+            get().connectSocket();
         } catch (error) {
             console.log("Error in checkAuth:", error);
             set({ authUser: null });
@@ -35,6 +41,7 @@ export const useAuthStore = create((set) => ({
           const res = await axiosInstance.post("/auth/signup", data);
           set({ authUser: res.data });
           toast.success("Account created successfully");
+          get().connectSocket();
       } catch (error) {
           toast.error(error.response.data.message);
       } finally {
@@ -53,6 +60,7 @@ export const useAuthStore = create((set) => ({
                 // If incorrect → sends error message.
             set({ authUser: res.data });// Saves the logged-in user’s data and Now any component that uses authUser knows the user is logged in.
             toast.success("Logged in successfully");
+            get().connectSocket();
         } catch (error) {
             // shows the exact backend message.
             toast.error(error.response.data.message);
@@ -69,6 +77,7 @@ export const useAuthStore = create((set) => ({
             // This removes the session → user is no longer authenticated.
             set({ authUser: null });
             toast.success("Logged out successfully");
+            get().disconnectSocket();
         } catch (error) {
             toast.error(error.response.data.message);
         }
@@ -90,5 +99,24 @@ export const useAuthStore = create((set) => ({
         }
     },
 
+    connectSocket: ()=> {
+        const { authUser } = get();
+        if (!authUser || get().socket?.connected) return;
 
+        const socket = io(BASE_URL,{
+            query:{
+                userId: authUser._id,
+            },
+        });
+        socket.connect();
+
+        set({ socket: socket });
+
+        socket.on("getOnlineUsers", (userIds) => {
+        set({ onlineUsers: userIds });
+        });
+    },
+    disconnectSocket: ()=> {
+        if (get().socket?.connected) get().socket.disconnect();
+    }
 }))
