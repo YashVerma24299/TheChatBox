@@ -8,11 +8,21 @@ import messageRoutes from "./routes/message.route.js";
 import cors from "cors";
 import { app,server } from "./lib/socket.js";
 
+
+import path from "path"
+const __dirname =path.resolve();
 const PORT=process.env.PORT;
 
 app.use(express.json());
 app.use(cookieParser());
 
+if (process.env.NODE_ENV === "production") {
+  app.use(express.static(path.join(__dirname, "../Client/dist")));
+
+  app.get("*", (req, res) => {
+    res.sendFile(path.join(__dirname, "../Client", "dist", "index.html"));
+  });
+}
 
 // you’re telling your backend to handle requests coming from a different origin (frontend side).
 app.use(
